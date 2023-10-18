@@ -1,7 +1,7 @@
 version: "3"
 services:
   nas-tools:
-    image: shmilyin/nas-tools #若使用最新镜像请改为jxxghp/nas-tools:latest
+    image: shmilyin/nas-tools:2.9.1 #若使用最新镜像请改为jxxghp/nas-tools:latest
     ports:
       - 3000:3000 # 默认的webui控制端口
     volumes:
