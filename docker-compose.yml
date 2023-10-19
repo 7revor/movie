@@ -1,8 +1,8 @@
 version: "3"
 services:
   nas-tools:
-    # image: shmilyin/nas-tools:2.9.1 # 公网BT
-    image: nastools/nas-tools:2.9.1 # 若使用最新镜像请改为jxxghp/nas-tools:latest
+    # image: shmilyin/nas-tools:2.9.1 # 带公网公网BT amd64 only
+    image: nastools/nas-tools:2.9.1 # 若使用最新镜像请改为jxxghp/nas-tools:latest amd/arm
     ports:
       - 3000:3000 # 默认的webui控制端口
     volumes:
