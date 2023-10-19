@@ -8,7 +8,6 @@ services:
       - ./nastool_config:/config # 冒号左边请修改为你想保存配置的路径
       - ./downloads:/downloads #设置下载路径
       - /root/.config/rclone:/root/.config/rclone #rclone配置文件映射
-      - /mnt:/mnt
     environment:
       - PUID=0 # 想切换为哪个用户来运行程序，该用户的uid
       - PGID=0 # 想切换为哪个用户来运行程序，该用户的gid
@@ -28,6 +27,7 @@ services:
       - TZ=Asia/Shanghai # 你的时区
       - UMASK_SET=000
       - WEBUI_PORT=58080 # 将此处修改成你欲使用的 WEB 管理平台端口 
+      - RCLONE_TRANSFERS = 8
     volumes:
       - ./qb_config:/config # 绝对路径请修改为自己的config文件夹
       - ./downloads:/downloads # 绝对路径请修改为自己的downloads文件夹
