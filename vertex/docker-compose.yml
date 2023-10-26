@@ -1,0 +1,12 @@
+version: "3"
+services:
+  vertex:
+    image: lswl/vertex:stable
+    ports:
+      - 3001:3000 # 默认的webui控制端口
+    volumes:
+      - ./vertex:/vertex 
+    environment:
+      - TZ=Asia/Shanghai # 你的时区
+    restart: unless-stopped
+    container_name: vertex
