@@ -9,6 +9,7 @@ services:
       - UID=1000 # The UID to run emby as (default: 2)
       - GID=100 # The GID to run emby as (default 2)
       - GIDLIST=100 # A comma-separated list of additional GIDs to run emby as (default: 2)
+      - TZ=Asia/Shanghai # 你的时区
     volumes:
       - ./data:/config # Configuration directory
       - /mnt:/mnt # Media directory

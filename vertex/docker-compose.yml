@@ -5,7 +5,7 @@ services:
     ports:
       - 3001:3000 # 默认的webui控制端口
     volumes:
-      - ./vertex:/vertex 
+      - ./data:/vertex 
     environment:
       - TZ=Asia/Shanghai # 你的时区
     restart: unless-stopped

@@ -7,7 +7,7 @@ services:
     ports:
       - 3000:3000 # 默认的webui控制端口
     volumes:
-      - ./nastool_config:/config # 冒号左边请修改为你想保存配置的路径
+      - ./nastool_data:/config # 冒号左边请修改为你想保存配置的路径
       - ./downloads:/downloads #设置下载路径
       - /root/.config/rclone:/nt/.config/rclone #rclone配置文件映射
     environment:
@@ -33,7 +33,7 @@ services:
       - UMASK_SET=000
       - WEBUI_PORT=58080 # 将此处修改成你欲使用的 WEB 管理平台端口 
     volumes:
-      - ./qb_config:/config # 绝对路径请修改为自己的config文件夹
+      - ./qb_data:/config # 绝对路径请修改为自己的config文件夹
       - ./downloads:/downloads # 绝对路径请修改为自己的downloads文件夹
     ports:
       - 58080:58080 # GUI
