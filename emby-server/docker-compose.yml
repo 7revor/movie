@@ -14,4 +14,4 @@ services:
       - /mnt:/mnt # Media directory
     ports:
       - 8096:8096 # HTTP port
-    restart: on-failure
+    restart: unless-stopped
