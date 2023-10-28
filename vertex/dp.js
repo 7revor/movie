@@ -7,6 +7,13 @@
  * 在每次删种任务的前20秒不进行信息更新，让动态规划获取的删种结果尽可能准确
  */
 const deleteTorrent = (maindata, torrent) => {
+  // 日志记录
+  let _log;
+  try {
+    _log = logger.info;
+  } catch (e) {
+    _log = console.log;
+  }
   const GB = 1024 * 1024 * 1024;
   const { torrents } = maindata;
   //  最大上传速度（MiB/s）（默认下载限速150MiB/s）
@@ -91,13 +98,7 @@ const deleteTorrent = (maindata, torrent) => {
 
     return result;
   }
-
-  try {
-    logger.info("磁盘剩余空间：", freeSpaceOnDisk.toFixed(2) + " GB");
-    logger.info("种子已使用空间：", maindata.usedSpace / GB.toFixed(2) + " GB");
-    logger.info("待处理种子数量：", formattedList.length);
-  } catch (e) {}
-
+  let isDP = false;
   // 大于2倍空间增量，（默认20）
   if (freeSpaceOnDisk >= spaceIncrementNextMin * 2) {
     // 删除已完成的且上传速度基本为0的种子
@@ -107,15 +108,20 @@ const deleteTorrent = (maindata, torrent) => {
   }
   // 小于2倍空间增量，补充到2倍
   else {
+    isDP = true;
     const spaceNeed = Math.ceil(spaceIncrementNextMin * 2 - freeSpaceOnDisk);
-    try {
-      logger.info("需要释放空间: " + spaceNeed + " GB");
-    } catch (e) {}
     deletedList.push(...dp(formattedList, spaceNeed));
   }
 
   // 执行删除
   if (deletedList.some((item) => item.name === torrent.name)) {
+    if (isDP) {
+      const spaceNeed = Math.ceil(spaceIncrementNextMin * 2 - freeSpaceOnDisk);
+      _log("待处理种子数量：", formattedList.length);
+      _log("磁盘剩余空间：", freeSpaceOnDisk.toFixed(2) + " GB");
+      _log("需要释放空间: " + spaceNeed + " GB");
+      _log("当前种子大小：", torrent.completed / GB.toFixed(2) + " GB");
+    }
     return true;
   }
 
