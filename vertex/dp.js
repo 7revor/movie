@@ -139,6 +139,7 @@ const deleteTorrent = (maindata, torrent) => {
       _log("实时上传速度：", (torrent.uploadSpeed / MB).toFixed(2) + " MiB/s");
     } else {
       _log("种子已完成且无速度，直接删除");
+      _log("释放空间：", (torrent.completed / GB).toFixed(2) + " GB");
     }
     _log("------------------------处理完成--------------------------");
     return true;
