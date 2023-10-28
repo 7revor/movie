@@ -1,3 +1,11 @@
+/**
+ * 使用动态规划进行空间释放
+ * 速度 -> 价值，空间 -> 重量
+ * NOTE:
+ * vt下载器的默认删种执行周期为1m，信息更新周期为4s，且qb更新剩余空间有延迟，会有一定概率导致动态规划执行过程中种子列表以及速度发生变化
+ * 需要将vt下载器的信息更新周期改为: 20/4 * * * * *
+ * 在每次删种任务的前20秒不进行信息更新，让动态规划获取的删种结果尽可能准确
+ */
 const deleteTorrent = (maindata, torrent) => {
   const GB = 1024 * 1024 * 1024;
   const { torrents } = maindata;
@@ -113,10 +121,15 @@ const deleteTorrent = (maindata, torrent) => {
 
   return false;
 };
-// 测试用例
-const test = () => {
+/**
+ * 测试用例
+ */
+const runTest = () => {
   const MB = 1024 * 1024;
   const GB = 1024 * MB;
+  // 需要释放的磁盘空间
+  const freeSpaceOnDisk = 18 * GB;
+  // 种子列表
   const torrents = [
     { name: "1", uploadSpeed: 38 * MB, completed: 2 * GB, progress: 1 },
     { name: "2", uploadSpeed: 17 * MB, completed: 3 * GB, progress: 1 },
@@ -124,8 +137,8 @@ const test = () => {
     { name: "4", uploadSpeed: 4.38 * MB, completed: 1 * GB, progress: 1 },
   ];
   const maindata = {
-    torrents: torrents,
-    freeSpaceOnDisk: 18 * GB,
+    torrents,
+    freeSpaceOnDisk,
     usedSpace: torrents.reduce((acc, cur) => acc + cur.completed, 0),
   };
 
@@ -136,9 +149,9 @@ const test = () => {
         space: torrent.completed / 1024 / 1024 / 1024 + " GB",
         speed: (torrent.uploadSpeed / 1024 / 1024).toFixed(2) + " MiB/s",
       },
-      deleteTorrent(maindata, torrent)
+      deleteTorrent(maindata, torrent) ? "删除" : ""
     );
   });
 };
 
-test();
+runTest();
