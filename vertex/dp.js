@@ -5,8 +5,22 @@
  * vt下载器的默认删种执行周期为1m，信息更新周期为4s，且qb更新剩余空间有延迟，会有一定概率导致动态规划执行过程中种子列表以及速度发生变化
  * 需要将vt下载器的信息更新周期改为: 20/4 * * * * *
  * 在每次删种任务的前20秒不进行信息更新，让动态规划获取的删种结果尽可能准确
+ * 需要手动指定磁盘可用总空间，因为vt下载器返回的剩余空间不准确
  */
 const deleteTorrent = (maindata, torrent) => {
+  const KB = 1024;
+  const MB = 1024 * KB;
+  const GB = 1024 * MB;
+  /**
+   * 需要手动指定
+   * 1. 磁盘可用空间（GiB）（不使用qb返回的数据）
+   * 2. 最大上传速度（MiB/s）（默认下载限速150）
+   * 3. 删种执行间隔（秒）
+   */
+  const diskSpace = 140 * GB;
+  const maxDownloadSpeed = 150 * MB;
+  const reportInterval = 60;
+
   // 日志记录
   let _log;
   try {
@@ -14,19 +28,16 @@ const deleteTorrent = (maindata, torrent) => {
   } catch (e) {
     _log = console.log.bind(console);
   }
-  const GB = 1024 * 1024 * 1024;
-  const { torrents } = maindata;
-  //  最大上传速度（MiB/s）（默认下载限速150MiB/s）
-  const maxDownloadSpeed = 150;
-  // 删种执行间隔（秒）
-  const reportInterval = 60;
-  // 磁盘剩余空间（GB）
-  const freeSpaceOnDisk = maindata.freeSpaceOnDisk / GB;
 
-  // 到下次汇报的空间增量（GB）（预留1GB）
-  const spaceIncrementNextMin = Math.ceil((maxDownloadSpeed * reportInterval) / 1024) + 1;
+  const { torrents, usedSpace } = maindata;
 
-  // 剩余空间大于3倍空间增量（默认30），跳过
+  // 磁盘剩余空间
+  const freeSpaceOnDisk = diskSpace - usedSpace;
+
+  // 到下次汇报的空间增量（预留1GB）
+  const spaceIncrementNextMin = Math.ceil(maxDownloadSpeed * reportInterval) + 1 * GB;
+
+  // 剩余空间大于3倍空间增量（默认30GB），跳过
   if (freeSpaceOnDisk >= 3 * spaceIncrementNextMin) {
     return false;
   }
@@ -39,7 +50,7 @@ const deleteTorrent = (maindata, torrent) => {
   // 拿不到torrents信息（异常情况）
   if (!torrents) {
     // 删除所有速度低于2MiB/s的种子
-    if (torrent.uploadSpeed < 2 * 1024 * 1024) {
+    if (torrent.uploadSpeed < 2 * MB) {
       return true;
     }
   }
@@ -102,26 +113,27 @@ const deleteTorrent = (maindata, torrent) => {
   // 大于2倍空间增量，（默认20）
   if (freeSpaceOnDisk >= spaceIncrementNextMin * 2) {
     // 删除已完成的且上传速度基本为0的种子
-    if (torrent.progress === 1 && torrent.uploadSpeed < 1024) {
+    if (torrent.progress === 1 && torrent.uploadSpeed < 1 * KB) {
       deletedList.push(torrent);
     }
   }
   // 小于2倍空间增量，补充到2倍
   else {
     isDP = true;
-    const spaceNeed = Math.ceil(spaceIncrementNextMin * 2 - freeSpaceOnDisk);
+    // 需要的空间，GB
+    const spaceNeed = Math.ceil((spaceIncrementNextMin * 2 - freeSpaceOnDisk) / GB);
     deletedList.push(...dp(formattedList, spaceNeed));
   }
 
   // 执行删除
   if (deletedList.some((item) => item.name === torrent.name)) {
     if (isDP) {
-      const spaceNeed = Math.ceil(spaceIncrementNextMin * 2 - freeSpaceOnDisk);
+      const spaceNeed = Math.ceil((spaceIncrementNextMin * 2 - freeSpaceOnDisk) / GB);
       _log("待处理种子数量：", formattedList.length);
-      _log("磁盘剩余空间：", freeSpaceOnDisk.toFixed(2) + " GB");
+      _log("磁盘剩余空间：", (freeSpaceOnDisk / GB).toFixed(2) + " GB");
       _log("需要释放空间: " + spaceNeed + " GB");
       _log("当前种子大小：", (torrent.completed / GB).toFixed(2) + " GB");
-      _log("当前种子速度：", (torrent.uploadSpeed / 1024 / 1024).toFixed(2) + " MiB/s");
+      _log("当前种子速度：", (torrent.uploadSpeed / MB).toFixed(2) + " MiB/s");
     }
     return true;
   }
@@ -132,20 +144,19 @@ const deleteTorrent = (maindata, torrent) => {
  * 测试用例
  */
 const runTest = () => {
-  const MB = 1024 * 1024;
+  const KB = 1024;
+  const MB = 1024 * KB;
   const GB = 1024 * MB;
-  // 需要释放的磁盘空间
-  const freeSpaceOnDisk = 18 * GB;
   // 种子列表
   const torrents = [
-    { name: "1", uploadSpeed: 38 * MB, completed: 2 * GB, progress: 1 },
-    { name: "2", uploadSpeed: 17 * MB, completed: 3 * GB, progress: 1 },
-    { name: "3", uploadSpeed: 3.75 * MB, completed: 3 * GB, progress: 1 },
-    { name: "4", uploadSpeed: 4.38 * MB, completed: 1 * GB, progress: 1 },
+    { name: "1", uploadSpeed: 38 * MB, completed: 60 * GB, progress: 1 },
+    { name: "2", uploadSpeed: 17 * MB, completed: 35 * GB, progress: 1 },
+    { name: "3", uploadSpeed: 18.75 * MB, completed: 20 * GB, progress: 1 },
+    { name: "4", uploadSpeed: 4.38 * MB, completed: 10 * GB, progress: 1 },
+    { name: "5", uploadSpeed: 0, completed: 10 * GB, progress: 1 },
   ];
   const maindata = {
     torrents,
-    freeSpaceOnDisk,
     usedSpace: torrents.reduce((acc, cur) => acc + cur.completed, 0),
   };
 
