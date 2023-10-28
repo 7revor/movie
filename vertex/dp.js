@@ -128,19 +128,18 @@ const deleteTorrent = (maindata, torrent) => {
   // 执行删除
   if (deletedList.some((item) => item.name === torrent.name)) {
     _log("------------------------开始处理--------------------------");
-    _log("当前种子名称：" + torrent.name);
-    _log("当前剩余空间：" + (freeSpaceOnDisk / GB).toFixed(2) + " GB");
+    _log("种子名称：" + torrent.name);
+    _log("剩余空间：" + (freeSpaceOnDisk / GB).toFixed(2) + " GB");
     if (isDP) {
       const spaceNeed = Math.ceil((spaceIncrementNextMin * 2 - freeSpaceOnDisk) / GB);
-      _log("----开始动态规划----");
-      _log("待处理种子数量：", formattedList.length);
-      _log("磁盘剩余空间：", (freeSpaceOnDisk / GB).toFixed(2) + " GB");
+      _log(">>>>>>>>动态规划<<<<<<<<");
       _log("需要释放空间: " + spaceNeed + " GB");
-      _log("当前种子大小：", (torrent.completed / GB).toFixed(2) + " GB");
-      _log("当前种子速度：", (torrent.uploadSpeed / MB).toFixed(2) + " MiB/s");
-      _log("----动态规划结束----");
+      _log("规划种子数量：", formattedList.length);
+      _log("删除种子大小：", (torrent.completed / GB).toFixed(2) + " GB");
+      _log("删除种子速度：", (torrent.uploadSpeed / MB).toFixed(2) + " MiB/s");
+      _log(">>>>>>>>动态规划<<<<<<<<");
     } else {
-      _log("当前种子速度为0，直接删除");
+      _log("种子已完成且无速度，直接删除");
     }
     _log("------------------------处理完成--------------------------");
     return true;
