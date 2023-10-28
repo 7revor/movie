@@ -10,9 +10,9 @@ const deleteTorrent = (maindata, torrent) => {
   // 日志记录
   let _log;
   try {
-    _log = logger.info;
+    _log = logger.info.bind(logger);
   } catch (e) {
-    _log = console.log;
+    _log = console.log.bind(console);
   }
   const GB = 1024 * 1024 * 1024;
   const { torrents } = maindata;
@@ -120,7 +120,8 @@ const deleteTorrent = (maindata, torrent) => {
       _log("待处理种子数量：", formattedList.length);
       _log("磁盘剩余空间：", freeSpaceOnDisk.toFixed(2) + " GB");
       _log("需要释放空间: " + spaceNeed + " GB");
-      _log("当前种子大小：", torrent.completed / GB.toFixed(2) + " GB");
+      _log("当前种子大小：", (torrent.completed / GB).toFixed(2) + " GB");
+      _log("当前种子速度：", (torrent.uploadSpeed / 1024 / 1024).toFixed(2) + " MiB/s");
     }
     return true;
   }
