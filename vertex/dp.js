@@ -5,7 +5,7 @@
  * vt下载器的默认删种执行周期为1m，信息更新周期为4s，且qb更新剩余空间有延迟，会有一定概率导致动态规划执行过程中种子列表以及速度发生变化
  * 需要将vt下载器的信息更新周期改为: 20/4 * * * * *
  * 在每次删种任务的前20秒不进行信息更新，让动态规划获取的删种结果尽可能准确
- * 需要手动指定磁盘可用总空间，因为vt下载器返回的剩余空间不准确
+ * 需要手动指定磁盘可用总空间，因为vt下载器返回的剩余空间不准确，可能下一个删种周期使用的还是上次的缓存值
  */
 const deleteTorrent = (maindata, torrent) => {
   const KB = 1024;
@@ -36,7 +36,6 @@ const deleteTorrent = (maindata, torrent) => {
 
   // 到下次汇报的空间增量（预留1GB）
   const spaceIncrementNextMin = Math.ceil(maxDownloadSpeed * reportInterval) + 1 * GB;
-
   // 剩余空间大于3倍空间增量（默认30GB），跳过
   if (freeSpaceOnDisk >= 3 * spaceIncrementNextMin) {
     return false;
@@ -49,6 +48,7 @@ const deleteTorrent = (maindata, torrent) => {
 
   // 拿不到torrents信息（异常情况）
   if (!torrents) {
+    _log("------------------未拿到种子信息，批量删除---------------------");
     // 删除所有速度低于2MiB/s的种子
     if (torrent.uploadSpeed < 2 * MB) {
       return true;
@@ -127,14 +127,22 @@ const deleteTorrent = (maindata, torrent) => {
 
   // 执行删除
   if (deletedList.some((item) => item.name === torrent.name)) {
+    _log("------------------------开始处理--------------------------");
+    _log("当前种子名称：" + torrent.name);
+    _log("当前剩余空间：" + (freeSpaceOnDisk / GB).toFixed(2) + " GB");
     if (isDP) {
       const spaceNeed = Math.ceil((spaceIncrementNextMin * 2 - freeSpaceOnDisk) / GB);
+      _log("----开始动态规划----");
       _log("待处理种子数量：", formattedList.length);
       _log("磁盘剩余空间：", (freeSpaceOnDisk / GB).toFixed(2) + " GB");
       _log("需要释放空间: " + spaceNeed + " GB");
       _log("当前种子大小：", (torrent.completed / GB).toFixed(2) + " GB");
       _log("当前种子速度：", (torrent.uploadSpeed / MB).toFixed(2) + " MiB/s");
+      _log("----动态规划结束----");
+    } else {
+      _log("当前种子速度为0，直接删除");
     }
+    _log("------------------------处理完成--------------------------");
     return true;
   }
 
