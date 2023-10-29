@@ -36,8 +36,9 @@ const deleteTorrent = (maindata, torrent) => {
 
   // 到下次汇报的空间增量（预留1GB）
   const spaceIncrementNextMin = Math.ceil(maxDownloadSpeed * reportInterval) + 1 * GB;
-  // 剩余空间大于3倍空间增量（默认30GB），跳过
-  if (freeSpaceOnDisk >= 3 * spaceIncrementNextMin) {
+
+  // 剩余空间大于4倍空间增量（默认40GB），跳过
+  if (freeSpaceOnDisk >= 4 * spaceIncrementNextMin) {
     return false;
   }
 
@@ -110,10 +111,17 @@ const deleteTorrent = (maindata, torrent) => {
     return result;
   }
   let isDP = false;
-  // 大于2倍空间增量，（默认20）
-  if (freeSpaceOnDisk >= spaceIncrementNextMin * 2) {
+  // 大于3倍空间增量，（默认30）
+  if (freeSpaceOnDisk >= spaceIncrementNextMin * 3) {
     // 删除已完成的且上传速度基本为0的种子
     if (torrent.progress === 1 && torrent.uploadSpeed < 1 * KB) {
+      deletedList.push(torrent);
+    }
+  }
+  // 大于2倍空间增量，（默认29）
+  else if (freeSpaceOnDisk >= spaceIncrementNextMin * 2) {
+    // 删除已完成的且上传速度小于1MiB/s的种子
+    if (torrent.progress === 1 && torrent.uploadSpeed < 1 * MB) {
       deletedList.push(torrent);
     }
   }
