@@ -3,7 +3,7 @@ services:
   nas-tools:
     # image: shmilyin/nas-tools:2.9.1 # 带公网公网BT amd64 only
     # image: nastools/nas-tools:2.9.1 # 若使用最新镜像请改为jxxghp/nas-tools:latest amd/arm
-    image: nastools/nas-tools:latest 
+    image: nastools/nas-tools:latest
     ports:
       - 3000:3000 # 默认的webui控制端口
     volumes:
@@ -24,7 +24,7 @@ services:
     hostname: nas-tools
     container_name: nas-tools
   qbittorrent:
-    image: linuxserver/qbittorrent
+    image: linuxserver/qbittorrent:4.3.9
     container_name: qbittorrent
     environment:
       - PUID=1000
