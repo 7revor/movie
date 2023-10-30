@@ -1,6 +1,6 @@
 version: "3"
 services:
-  nas-tools:
+  moviepilot:
     image: jxxghp/moviepilot:latest
     ports:
       - 3000:3000 # 默认的webui控制端口
