@@ -43,7 +43,7 @@ const freeExpired = (maindata, torrent) => {
   const MB = 1024 * KB;
   const GB = 1024 * MB;
 
-  const { name, addedTime, category, progress } = torrent;
+  const { name, addedTime, category, progress, size } = torrent;
 
   // 只限制彩虹岛
   if (category !== "chdbits") {
@@ -68,15 +68,10 @@ const freeExpired = (maindata, torrent) => {
   };
 
   // CHDWEB 官方免费周期
-  if (/CHDWEB$/.text(name)) {
+  if (/CHDWEB$/.test(name)) {
     return moment().unix() - addedTime > CHDWEBFreeTime(size);
   }
 
   // 其他，24小时后删种
   return moment().unix() - addedTime > 24 * 3600;
-};
-
-const torrent = {
-  name: "[Movies]Open Range 2003 1080p GER Blu-ray AVC DTS-HD MA 6.1",
-  size: 44 * 1024 * 1024 * 1024,
 };
