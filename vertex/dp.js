@@ -51,9 +51,7 @@ const deleteTorrent = (maindata, torrent) => {
   if (!torrents) {
     _log("------------------未拿到种子信息，批量删除---------------------");
     // 删除所有速度低于2MiB/s的种子
-    if (torrent.uploadSpeed < 2 * MB) {
-      return true;
-    }
+    return torrent.uploadSpeed < 2 * MB;
   }
 
   // 只剩一个种子，不删
