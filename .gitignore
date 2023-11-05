@@ -1,1 +1,6 @@
 .DS_Store
+/emby-server/data
+/vertex/data
+/qb/data
+/nastool-qb/nastool_data
+/nastool-qb/qb_data
