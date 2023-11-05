@@ -24,7 +24,7 @@ services:
     hostname: nas-tools
     container_name: nas-tools
   qbittorrent:
-    image: linuxserver/qbittorrent:4.3.9
+    image: linuxserver/qbittorrent:4.4.5
     container_name: qbittorrent
     environment:
       - PUID=1000
