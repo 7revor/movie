@@ -14,7 +14,7 @@ const rss = (torrent) => {
   }
 
   // 官种
-  const isOfficial = (name) => /CHDWEB$|CHDBits$|CHD$/.test(name);
+  const isOfficial = (name) => /(-|@)CHDWEB|(-|@)CHDBits|(-|@)CHD/.test(name);
 
   // Movies
   if (/^\[Movies\]/.test(name)) {
