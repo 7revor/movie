@@ -68,7 +68,7 @@ const freeExpired = (maindata, torrent) => {
   };
 
   // CHDWEB 官方免费周期
-  if (/CHDWEB$/.test(name)) {
+  if (/(-|@)CHDWEB/.test(name)) {
     return moment().unix() - addedTime > CHDWEBFreeTime(size);
   }
 
