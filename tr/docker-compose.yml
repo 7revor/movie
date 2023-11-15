@@ -14,6 +14,7 @@ services:
     volumes:
       - ./data:/config
       - ./webui:/webui
+      - ./downloads:/downloads
     ports:
       - 18081:9091 # GUI
       # 要使用的映射下载端口与内部下载端口，可保持默认，安装完成后在管理页面仍然可以改成其他端口。
