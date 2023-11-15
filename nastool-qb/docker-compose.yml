@@ -24,13 +24,13 @@ services:
     hostname: nas-tools
     container_name: nas-tools
   qbittorrent:
-    image: linuxserver/qbittorrent:4.4.5
+    image: linuxserver/qbittorrent:4.4.5-libtorrentv1
     container_name: qbittorrent
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Asia/Shanghai # 你的时区
-      - UMASK_SET=000
+      - UMASK=000
       - WEBUI_PORT=58080 # 将此处修改成你欲使用的 WEB 管理平台端口 
     volumes:
       - ./qb_data:/config # 绝对路径请修改为自己的config文件夹

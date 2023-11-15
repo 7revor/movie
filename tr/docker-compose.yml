@@ -1,0 +1,24 @@
+version: "3"
+services:
+  transmission:
+    image: linuxserver/transmission:latest
+    container_name: transmission
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Shanghai # 你的时区
+      - UMASK=000
+      - PASS=7revor7071
+      - USER=7revor
+      - TRANSMISSION_WEB_HOME=/webui
+    volumes:
+      - ./data:/config
+      - ./webui:/webui
+    ports:
+      - 18081:9091 # GUI
+      # 要使用的映射下载端口与内部下载端口，可保持默认，安装完成后在管理页面仍然可以改成其他端口。
+      - 16882:16882
+      - 16882:16882/udp
+      # 此处WEB UI 目标端口与内部端口务必保证相同，见问题1
+    restart: unless-stopped
+    

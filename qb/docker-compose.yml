@@ -7,7 +7,7 @@ services:
       - PUID=1000
       - PGID=1000
       - TZ=Asia/Shanghai # 你的时区
-      - UMASK_SET=000
+      - UMASK=000
       - WEBUI_PORT=58080 # 将此处修改成你欲使用的 WEB 管理平台端口 
     volumes:
       - ./data:/config # 绝对路径请修改为自己的config文件夹
